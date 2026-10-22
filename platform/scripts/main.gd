@@ -34,6 +34,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_player_died() -> void:
+	Game.break_streak()
 	if Game.use_shield():   # Хамгаалалт амийг авч үлдэнэ — зөвхөн аюулгүй газар дахин төрнө
 		player.respawn(world.safe_position_after(player.global_position.x))
 		return

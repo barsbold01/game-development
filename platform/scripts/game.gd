@@ -14,6 +14,9 @@ const START_LIVES := 3
 const SHIELD_GOAL_MIN := 5   # Эхэндээ хэдэн зоосоор хамгаалалт авах вэ
 const SHIELD_GOAL_MAX := 10  # Хамгийн хэцүү үед хэдэн зоос шаардах вэ
 const EXTRA_SHIELD_BONUS := 100   # Хамгаалалттай байхад дахин дүүргэвэл өгөх оноо
+const PERFECT_TIME := 0.45   # Хэсгийг тавьснаас хойш хэдэн секундэд гүйгч хүрвэл PERFECT вэ
+const PERFECT_BONUS := 25    # PERFECT бүрийн оноо — дараалан хийх тусам үржинэ
+const PERFECT_STREAK_MAX := 4
 
 var state := State.MENU
 var lives := START_LIVES
@@ -23,6 +26,7 @@ var best := 0                # Хамгийн өндөр оноо (тоглоо�
 var coins := 0              # Энэ раундад нийт цуглуулсан зоос
 var shield_progress := 0    # Дараагийн хамгаалалт хүртэл цуглуулсан зоос
 var has_shield := false     # Нэг удаагийн хамгаалалт (амь хасагдахаас аварна)
+var perfect_streak := 0     # Дараалсан PERFECT-ийн тоо
 var dragging: Node = null    # Одоо чирж байгаа хэсэг (нэг л зүйл чирнэ)
 var sfx: Sfx                 # Дуу гаргагч
 
@@ -61,6 +65,7 @@ func reset() -> void:
 	coins = 0
 	shield_progress = 0
 	has_shield = false
+	perfect_streak = 0
 	dragging = null
 	changed.emit()
 
@@ -75,6 +80,22 @@ func add_bonus(amount: int) -> void:
 	bonus += amount
 	sfx.beep(880, 0.06)
 	changed.emit()
+
+
+## Хэсгийг яг цагтаа тавихад дуудагдана. Дараалан хийх тусам оноо өснө (25, 50, 75, 100).
+## Өгсөн оноог буцаана.
+func perfect() -> int:
+	perfect_streak = mini(perfect_streak + 1, PERFECT_STREAK_MAX)
+	var amount := PERFECT_BONUS * perfect_streak
+	bonus += amount
+	sfx.beep(1046 + perfect_streak * 130, 0.15)
+	changed.emit()
+	return amount
+
+
+## Хэсгийг хоцорч тавих эсвэл үхэхэд PERFECT-ийн цуваа тасарна
+func break_streak() -> void:
+	perfect_streak = 0
 
 
 ## Зоос авахад дуудагдана. Зорилгодоо хүрвэл хамгаалалт автоматаар авна.

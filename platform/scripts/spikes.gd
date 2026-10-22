@@ -7,6 +7,7 @@ var width := 16.0   # 8px-ийн олон шүд
 
 
 func _ready() -> void:
+	add_to_group("hazard")   # Трамплины PERFECT: саадын өмнө тавьсан эсэхийг шалгана
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = Vector2(width - 4.0, 4.0)   # Ирмэг дээр нь бага зэрэг өршөөнө

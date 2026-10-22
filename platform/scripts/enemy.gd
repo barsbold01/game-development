@@ -13,6 +13,7 @@ var t := 0.0
 
 
 func _ready() -> void:
+	add_to_group("hazard")   # Трамплины PERFECT: саадын өмнө тавьсан эсэхийг шалгана
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = Vector2(12, 8)

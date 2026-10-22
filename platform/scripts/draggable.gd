@@ -6,6 +6,7 @@ extends CollisionObject2D
 ## - Дэлгэцийн зүүн ирмэгээс гарч хоцорвол тавиур руугаа буцна.
 ## - ТАВИУР РУУ ЗАЙ ХАЛАХГҮЙ: дэлгэцийн ХААНА Ч дарахад дараагийн хэсэг хулганан дээр ирнэ.
 ## - МАГНИТ: банзыг нүх рүү ойртуулахад нүхэнд яг тохирох байрлалд өөрөө очиж наалдана.
+## - PERFECT: тавьснаас хойш Game.PERFECT_TIME секундэд гүйгч хүрвэл нэмэлт оноо өгнө.
 
 const GROUND_Y: float = preload("res://scripts/world.gd").GROUND_Y
 const SNAP_DIST := 20.0   # Газрын түвшингээс хэдэн пикселийн дотор тавьвал наалдах вэ
@@ -21,6 +22,8 @@ var in_tray := true
 var dragging := false
 var drag_offset := Vector2.ZERO
 var mouse_world := Vector2.ZERO   # Хулганы сүүлийн байрлал (дэлхийн координатаар)
+var placed_time := 0.0            # Хэзээ тавьсан бэ (секунд)
+var judged := true                # PERFECT эсэхийг аль хэдийн шийдсэн үү
 var camera: Camera2D
 
 
@@ -52,6 +55,8 @@ func _process(_delta: float) -> void:
 	collision_layer = 1 if active else 0
 	collision_mask = 1 if active else 0
 	modulate.a = 1.0 if active else 0.75
+	if active and not judged:
+		_check_perfect()
 
 
 ## Гүйгч энэ хэсгийг бүхэлд нь давж гарсан уу?
@@ -85,6 +90,9 @@ func _input(event: InputEvent) -> void:
 		dragging = false
 		Game.dragging = null
 		_snap_to_ground()
+		placed_time = Time.get_ticks_msec() / 1000.0
+		# Гүйгч аль хэдийн хүрчихсэн газарт тавьсан бол (жишээ нь гацсанаас аврах) PERFECT тооцохгүй
+		judged = _player_rect().end.x >= _shape_rect().position.x
 
 
 ## Хулгана хаана ч дарсан бол тавиур дахь дараагийн хэсгийг (нэг л хэсэг) барина.
@@ -159,6 +167,81 @@ func _snap_to_ground() -> void:
 		edge = global_position.y + (spr.get_rect().end.y if spr else _shape_rect().end.y - global_position.y)
 	if absf(edge - GROUND_Y) <= SNAP_DIST:
 		global_position.y += GROUND_Y - edge
+
+
+## Гүйгч энэ хэсэгт анх хүрэх агшинд нэг удаа шалгана: хэрэгтэй газар, яг цагтаа тавьсан уу?
+func _check_perfect() -> void:
+	var p := _player_rect()
+	var r := _shape_rect()
+	if p.end.x < r.position.x:
+		return   # Хараахан хүрээгүй
+	judged = true
+	var on_path := r.position.y <= p.end.y + 1.0 and r.end.y >= p.position.y
+	if not on_path or not _is_useful(r):
+		return
+	if Time.get_ticks_msec() / 1000.0 - placed_time <= Game.PERFECT_TIME:
+		_perfect_popup(Game.perfect())
+	else:
+		Game.break_streak()
+
+
+## Хоосон газар тавьж оноо "хураахаас" сэргийлнэ:
+## банз нүхийг хучсан, трамплин саадын (нүх, өндөрлөг, өргөс, цох) яг өмнө байх ёстой.
+func _is_useful(r: Rect2) -> bool:
+	var world := get_tree().get_first_node_in_group("world")
+	if world == null:
+		return false
+	var ahead := r.end.x + 80.0   # Трамплинаас хэр хол саад байж болох вэ
+	for s in world.segments:
+		if s.kind == "pit" and not snap_bottom and s.x < r.end.x and s.x + s.w > r.position.x:
+			return true
+		if s.kind != "ground" and snap_bottom and s.x >= r.position.x - 4.0 and s.x <= ahead:
+			return true
+	if snap_bottom:
+		for h in get_tree().get_nodes_in_group("hazard"):
+			if h.global_position.x >= r.position.x and h.global_position.x <= ahead:
+				return true
+	return false
+
+
+## Хэсгийн дээр "PERFECT!" бичиг үсэрч гараад алга болно, тоглоом хормын турш удааширна
+func _perfect_popup(amount: int) -> void:
+	var l := Label.new()
+	var streak := "" if Game.perfect_streak < 2 else " x%d" % Game.perfect_streak
+	l.text = "PERFECT%s!\n+%d" % [streak, amount]
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", 8)
+	l.add_theme_constant_override("line_spacing", -3)
+	l.add_theme_color_override("font_color", Color("ffe66d"))
+	l.add_theme_color_override("font_outline_color", Color("2f3542"))
+	l.add_theme_constant_override("outline_size", 3)
+	l.size = Vector2(80, 22)
+	l.pivot_offset = l.size / 2.0
+	l.z_index = 10
+	var r := _shape_rect()
+	l.position = get_parent().to_local(Vector2(r.get_center().x, r.position.y)) - Vector2(40, 26)
+	get_parent().add_child(l)
+
+	var tw := l.create_tween()
+	l.scale = Vector2(1.6, 1.6)
+	tw.tween_property(l, "scale", Vector2.ONE, 0.15)
+	tw.parallel().tween_property(l, "position:y", l.position.y - 14.0, 0.8)
+	tw.parallel().tween_property(l, "modulate:a", 0.0, 0.35).set_delay(0.45)
+	tw.tween_callback(l.queue_free)
+
+	# Хит-стоп: 0.12 бодит секунд удаашруулна (таймер time_scale-ийг үл тооно)
+	Engine.time_scale = 0.35
+	get_tree().create_timer(0.12, true, false, true).timeout.connect(func() -> void: Engine.time_scale = 1.0)
+
+
+## Гүйгчийн collision дөрвөлжин (дэлхийн координатаар)
+func _player_rect() -> Rect2:
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player == null:
+		return Rect2(-INF, 0, 0, 0)
+	var col := player.get_node("Collision") as CollisionShape2D
+	var size := (col.shape as RectangleShape2D).size
+	return Rect2(col.global_position - size / 2.0, size)
 
 
 ## Collision хэлбэрийн дөрвөлжин (дэлхийн координатаар)
