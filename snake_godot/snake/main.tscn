@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://p5fhebiwmayl"]
+
+[ext_resource type="Script" uid="uid://dsnxykgjeilce" path="res://snake.gd" id="1"]
+
+[node name="Main" type="Node2D" unique_id=1831106150]
+position = Vector2(174, 86)
+script = ExtResource("1")

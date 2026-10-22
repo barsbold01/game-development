@@ -1,0 +1,20 @@
+; Godot 4 төслийн тохиргоо
+; Энэ файлыг Godot-ын Project Manager дээрээс "Import" хийж нээнэ.
+
+config_version=5
+
+[application]
+
+config/name="3D Tetris"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1152
+window/size/viewport_height=720
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+anti_aliasing/quality/msaa_3d=2

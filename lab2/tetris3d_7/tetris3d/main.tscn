@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/game.gd" id="1_game"]
+
+[sub_resource type="Environment" id="Environment_bg"]
+background_mode = 1
+background_color = Color(0.043137, 0.054902, 0.086275, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.45098, 0.501961, 0.65098, 1)
+ambient_light_energy = 0.7
+tonemap_mode = 2
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_game")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_bg")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+
+[node name="CamPivot" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="CamPivot"]

@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://evumtf75gd4e"]
+
+[ext_resource type="Script" uid="uid://qs61fwm6n1ys" path="res://scripts/player.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dc4anp7koi7qu" path="res://sprites/hero.png" id="2"]
+
+[sub_resource type="RectangleShape2D" id="shape"]
+size = Vector2(10, 15)
+
+[node name="Player" type="CharacterBody2D" unique_id=44172858 groups=["player"]]
+script = ExtResource("1")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1163243083]
+texture = ExtResource("2")
+hframes = 2
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=1235173104]
+shape = SubResource("shape")
+
+[node name="Alert" type="Label" parent="." unique_id=1998233020]
+visible = false
+offset_left = -2.0
+offset_top = -22.0
+offset_right = 6.0
+offset_bottom = -10.0
+theme_override_colors/font_color = Color(0.91, 0.27, 0.24, 1)
+theme_override_font_sizes/font_size = 10
+text = "!"
+
+[node name="Dust" type="CPUParticles2D" parent="." unique_id=1979282532]
+position = Vector2(-4, 7)
+emitting = false
+amount = 6
+lifetime = 0.4
+direction = Vector2(-1, 0)
+spread = 20.0
+gravity = Vector2(0, -30)
+initial_velocity_min = 10.0
+initial_velocity_max = 20.0
+scale_amount_max = 2.0
+color = Color(0.79, 0.7, 0.42, 1)
