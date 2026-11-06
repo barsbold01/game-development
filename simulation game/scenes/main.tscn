@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://gxh6f448csyt"]
+
+[ext_resource type="Script" uid="uid://dmkp8j2e2rv03" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://diayxnqhc6ng8" path="res://scripts/field.gd" id="2_field"]
+[ext_resource type="Script" uid="uid://2fw3qtyufexc" path="res://scripts/dog.gd" id="3_dog"]
+[ext_resource type="Script" uid="uid://48soifysqfoo" path="res://scripts/hud.gd" id="4_hud"]
+[ext_resource type="Script" uid="uid://btpilw8kkmytv" path="res://scripts/trails.gd" id="5_trails"]
+[ext_resource type="Script" uid="uid://brau6llg1xvaa" path="res://scripts/effects.gd" id="6_effects"]
+[ext_resource type="Script" uid="uid://bm14vus4k8xek" path="res://scripts/sounds.gd" id="7_sounds"]
+
+[node name="Main" type="Node2D" unique_id=701886008]
+script = ExtResource("1_main")
+
+[node name="Field" type="Node2D" parent="." unique_id=836068124]
+script = ExtResource("2_field")
+
+[node name="Trails" type="Node2D" parent="." unique_id=1222571537]
+script = ExtResource("5_trails")
+
+[node name="Flock" type="Node2D" parent="." unique_id=241528855]
+
+[node name="Dog" type="Node2D" parent="." unique_id=1572200856]
+position = Vector2(30, 150)
+script = ExtResource("3_dog")
+
+[node name="Effects" type="Node2D" parent="." unique_id=112275931]
+script = ExtResource("6_effects")
+
+[node name="Sounds" type="Node" parent="." unique_id=1409773216]
+script = ExtResource("7_sounds")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1935720759]
+script = ExtResource("4_hud")
