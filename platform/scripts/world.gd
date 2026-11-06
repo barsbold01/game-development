@@ -55,7 +55,7 @@ func _process(_delta: float) -> void:
 
 
 ## Газрын дараа нүх эсвэл өндөрлөг, тэдгээрийн дараа заавал энгийн газар.
-## Ингэснээр нүхний хоёр ирмэг үргэлж GROUND_Y түвшинд байж банз магнитлана.
+## Ингэснээр нүхний хоёр ирмэг үргэлж GROUND_Y түвшинд байж банз тэгш хэвтэнэ.
 func _spawn_next() -> void:
 	var last: Dictionary = segments.back()
 	if last.kind != "ground":

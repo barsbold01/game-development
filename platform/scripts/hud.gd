@@ -41,7 +41,7 @@ func _ready() -> void:
 	add_child(coin_bar)
 
 	# Тавиурын зөвлөмж
-	var hint := _label(Vector2(150, 19), "← хаана ч дарж чир")
+	var hint := _label(Vector2(150, 19), "← хэсгийг барьж чир")
 	hint.modulate = Color(1, 1, 1, 0.8)
 
 	start_panel = _panel("JUST IN TIME",
@@ -107,35 +107,33 @@ func _label(pos: Vector2, text: String, size := 8) -> Label:
 	return l
 
 
-## Хагас тунгалаг хар самбар + гарчиг + тайлбар
+## Дэвсгэргүй гарчиг + тайлбар, дэлгэцийн голд. Бараан хүрээ нь тэнгэр, газар дээр уншигдуулна.
 func _panel(title: String, body_text: String) -> Control:
 	var root := Control.new()
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 
-	var bg := ColorRect.new()
-	bg.color = Color(0, 0, 0, 0.78)
-	bg.position = Vector2(32, 30)
-	bg.size = Vector2(192, 90)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(bg)
-
-	var t := Label.new()
-	t.text = title
-	t.position = Vector2(32, 36)
-	t.size = Vector2(192, 14)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	t.add_theme_font_size_override("font_size", 11)
+	var t := _panel_label(title, 11, 30.0)
 	t.add_theme_color_override("font_color", Color("ffe66d"))
 	root.add_child(t)
 
-	var b := Label.new()
-	b.text = body_text
-	b.position = Vector2(32, 54)
-	b.size = Vector2(192, 64)
-	b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	b.add_theme_font_size_override("font_size", 8)
+	var b := _panel_label(body_text, 8, 48.0)
 	root.add_child(b)
 
 	root.set_meta("body", b)
 	return root
+
+
+## Үсгийн хэмжээг ЭХЛЭЭД тохируулна: эс тэгвээс Label анхдагч (16) үсгээр тэлж, төвөөсөө гулсана
+func _panel_label(text: String, font_size: int, y: float) -> Label:
+	var l := Label.new()
+	l.add_theme_font_size_override("font_size", font_size)
+	l.add_theme_color_override("font_outline_color", Color("2f3542"))
+	l.add_theme_constant_override("outline_size", 3)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.grow_horizontal = Control.GROW_DIRECTION_BOTH   # Урт мөр гарвал хоёр тийш тэнцүү тэлнэ
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.text = text
+	l.position = Vector2(0, y)
+	l.size = Vector2(256, 0)
+	return l
